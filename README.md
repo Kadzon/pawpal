@@ -45,14 +45,12 @@ pip install -r requirements.txt
 ## 🖥️ Sample Output
 
 Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
+```
+# Daily plan for Jordan on 2026-10-12:
+#  08:00 - 08:10 Mochi: Feed Mochi [high] (high priority, fit within remaining time)
+#  08:10 - 08:40 Rex: Morning walk [high] (high priority, fit within remaining time)
+```
 
-```
-# e.g.:
-# Daily plan for Biscuit (Golden Retriever):
-#   08:00 — Morning walk (30 min) [priority: high]
-#   09:00 — Feeding (10 min) [priority: high]
-#   ...
-```
 
 ## 🧪 Testing PawPal+
 
@@ -67,19 +65,24 @@ pytest --cov
 Sample test output:
 
 ```
-# Paste your pytest output here
+# platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
+# rootdir: C:\Users\HP\codepath\pawpal
+# plugins: anyio-4.15.1
+# collected 8 items                                                                                                                                                    
+
+tests\test_pawpal.py 
 ```
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
+**How it works:** `Owner`, `Pet`, and `Task` (in `pawpal_system.py`) model the data — an owner has multiple pets, and each pet has its own list of tasks. `Owner.all_tasks()` is the single method that gathers every task across every pet, each paired with the pet it belongs to. `Scheduler.build_plan` (in `scheduler.py`) reads only from that method, never from one pet's task list directly — that's what lets it build a plan spanning multiple pets instead of just one. It filters the full task list down to what's actually due today, sorts the due tasks by priority then duration, then walks through them in order: each task either fits in the remaining time budget and gets scheduled, or it doesn't and gets recorded as skipped, along with a reason. The result is a `Plan` containing both lists plus the total time used.
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `Scheduler.build_plan` | Due tasks are sorted by priority (high → low), then by duration (shortest first) as a tiebreak, so higher-priority and quicker tasks get first claim on the time budget |
+| Filtering | `Task.is_due`, `Scheduler.build_plan` | `is_due` excludes tasks not due today (wrong weekday, or already completed today); `build_plan` then skips any remaining task that no longer fits the time budget |
+| Conflict handling | `Scheduler.build_plan` | Tasks don't have fixed times, so there's nothing to overlap — each due task is placed right after the previous one ends. A task that would exceed the remaining budget is moved to `Plan.skipped` with a reason instead of being scheduled |
+| Recurring tasks | `Task.frequency`, `Task.weekdays`, `Task.is_due`, `Task.mark_completed` / `mark_incomplete` | `DAILY` tasks are due every day; `WEEKLY` tasks carry a set of weekdays (0=Mon..6=Sun) and are due only when today matches one of them. `completed_on` stores the date a task was last marked done, so it drops off today's plan once completed but reappears automatically the next time it's due |
 
 ## 📸 Demo Walkthrough
 
