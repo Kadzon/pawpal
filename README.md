@@ -95,10 +95,15 @@ Confidence level: 5 stars
 
 Describe your app in numbered steps so a reader can follow along without watching a video:
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+1. **Set the owner.** The "Owner" section (`app.py`) starts pre-filled with a default name ("Jordan") stored in `st.session_state.owner`; edit the text box to rename them.
+2. **Add pets.** Under "Pets," enter a name + species and click "Add pet" (`Owner.add_pet`). Each pet shows up in the "Pet" dropdown used by the task form below.
+3. **Add tasks.** Pick a pet, then fill in title, duration, and priority (Low/Medium/High), plus a frequency: `Daily`, or `Weekly` with specific weekdays via the "Recurs on" multiselect. Clicking "Add task" calls `Pet.add_task`; if `Weekly` is chosen with no weekdays checked, the `Task.__post_init__` guard raises a `ValueError` that's shown as an inline error instead of crashing the app.
+4. **Review/edit tasks.** Each pet has an expander listing its tasks (title, duration, priority, and schedule e.g. "weekly on Mon, Wed"). Expanding a task reveals an edit form — change any field and click "Save changes" to update it in place (same weekly/weekday validation applies).
+5. **Generate today's schedule.** Under "Build schedule," pick a date and how many minutes are available today, then click "Generate schedule." This calls `Scheduler().build_plan(owner, plan_date, time_budget)`, which:
+   - Gathers every pet's tasks via `Owner.all_tasks()` and filters to only what's `is_due` on that date (recurrence + already-completed-today checks).
+   - **Sorts** due tasks by priority (High → Low), then by duration (shortest first) as a tiebreak — so urgent, quick wins get scheduled first.
+   - Walks the sorted list filling the time budget back-to-back starting at `day_start` (no fixed time slots, so nothing can double-book); any task that would blow the remaining budget is **skipped** with a reason instead of scheduled.
+6. **Read the plan.** Scheduled tasks render as a time-stamped list (`08:00–08:10 — Mochi: Feed Mochi (high priority, fit within remaining time)`) each with a "Done" button that calls `Task.mark_completed` and regenerates the plan on the spot. Skipped tasks show in a ⚠️ warning table with pet, task, duration, and why they didn't fit; if nothing was skipped, a ✅ success message confirms everything fit. A caption at the bottom always shows total minutes used vs. the budget.
+7. **Come back tomorrow.** Daily tasks reset automatically; weekly tasks reappear on their next matching weekday. Anything marked "Done" today will fall off the plan until its next due date, per `Task.is_due`.
 
-**Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
+

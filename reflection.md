@@ -44,8 +44,7 @@ One clear tradeoff: the scheduler is strictly priority-greedy — it fills the t
 
 **b. Judgment and verification**
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+When filling out the readme file, the agent suggested a pytest bash command that was not aligned to powershell. It also hallucinated a command that was not in my pycache neither in the requirements.txt so I had to reject the change and use the standard pytest running command.
 Running bash commands to test the functionality of the code. I needed to create a seperate file main.py to visualize the tests and also understand the implementations of what and how i am testing the logic. So when AI wrote the file I perused to ensure it's checking for the implementations i wanted for Pawpal.
 However, the AI did not explicitly set a preference list for the owner and implied that the start-time was a preference which could have had a better preference allocation/feature.
 ---
@@ -54,13 +53,11 @@ However, the AI did not explicitly set a preference list for the owner and impli
 
 **a. What you tested**
 
-- What behaviors did you test?
-- Why were these tests important?
+I tested the model (`is_due` recurrence across daily/weekly/completed states, and the weekly-with-no-weekdays `ValueError`) and the scheduler (priority/duration sort order across pets, not-due tasks being excluded vs. over-budget tasks being skipped, and that scheduled times never overlap), since those are the behaviors a wrong plan would silently depend on.
 
 **b. Confidence**
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
+All 21 tests passing gives me solid confidence in the core sort/filter/budget logic, but with more time I'd add edge cases like a zero-minute time budget, a single task longer than the entire budget, and marking a weekly task complete on a day it isn't even due.
 
 ---
 
@@ -68,12 +65,12 @@ However, the AI did not explicitly set a preference list for the owner and impli
 
 **a. What went well**
 
-- What part of this project are you most satisfied with?
+Understanding more features of streamlit and piecing a whole project together starting from the UML, to building the logic and the UI.
 
 **b. What you would improve**
 
-- If you had another iteration, what would you improve or redesign?
+A little more freedom to explore with my design of how I would manage my pets.
 
 **c. Key takeaway**
 
-- What is one important thing you learned about designing systems or working with AI on this project?
+Not everything AI suggests is correct, I will also have to verify it, especially the bash commands. Following it sometimes in a manual format helps understand the actions, the agent takes.

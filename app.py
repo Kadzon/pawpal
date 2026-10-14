@@ -184,8 +184,26 @@ if plan is not None:
         st.caption("Nothing scheduled.")
 
     if plan.skipped:
-        st.markdown("**Skipped:**")
-        for skipped in plan.skipped:
-            st.write(f"- {skipped.pet.name}: {skipped.task.title} — {skipped.reason}")
+        count = len(plan.skipped)
+        st.warning(
+            f"⚠️ {count} task{'s' if count != 1 else ''} didn't fit in today's "
+            f"{st.session_state.plan_budget}-minute budget:"
+        )
+        st.table(
+            [
+                {
+                    "Pet": skipped.pet.name,
+                    "Task": skipped.task.title,
+                    "Duration": f"{skipped.task.duration_minutes} min",
+                    "Why": skipped.reason,
+                }
+                for skipped in plan.skipped
+            ]
+        )
+    elif plan.scheduled:
+        n = len(plan.scheduled)
+        task_word = "task" if n == 1 else "tasks"
+        verb = "fits" if n == 1 else "fit"
+        st.success(f"✅ All {n} due {task_word} {verb} within today's budget.")
 
     st.caption(f"Total time used: {plan.total_minutes_used} / {st.session_state.plan_budget} minutes")

@@ -1,0 +1,78 @@
+classDiagram
+    class Owner {
+        +str name
+        +List~Pet~ pets
+        +add_pet(pet: Pet) None
+        +all_tasks() List~Tuple~Pet, Task~~
+    }
+
+    class Pet {
+        +str name
+        +str species
+        +List~Task~ tasks
+        +add_task(task: Task) None
+    }
+
+    class Priority {
+        <<enumeration>>
+        LOW
+        MEDIUM
+        HIGH
+    }
+
+    class Frequency {
+        <<enumeration>>
+        DAILY
+        WEEKLY
+    }
+
+    class Task {
+        +str title
+        +int duration_minutes
+        +Priority priority
+        +Frequency frequency
+        +Set~int~ weekdays
+        +Optional~date~ completed_on
+        +is_due(on_date: date) bool
+        +mark_completed(on_date: date) None
+        +mark_incomplete() None
+    }
+
+    class Scheduler {
+        +time day_start
+        +build_plan(owner: Owner, on_date: date, time_budget_minutes: int) Plan
+    }
+
+    class Plan {
+        +date date
+        +List~ScheduledTask~ scheduled
+        +List~SkippedTask~ skipped
+        +int total_minutes_used
+    }
+
+    class ScheduledTask {
+        +Task task
+        +Pet pet
+        +time start_time
+        +time end_time
+        +str reason
+    }
+
+    class SkippedTask {
+        +Task task
+        +Pet pet
+        +str reason
+    }
+
+    Owner "1" --> "*" Pet : owns
+    Pet "1" --> "*" Task : has
+    Task --> Priority
+    Task --> Frequency
+    Scheduler ..> Plan : creates
+    Scheduler ..> Owner : reads
+    Plan "1" --> "*" ScheduledTask : includes
+    Plan "1" --> "*" SkippedTask : excludes
+    ScheduledTask --> Task
+    ScheduledTask --> Pet
+    SkippedTask --> Task
+    SkippedTask --> Pet
