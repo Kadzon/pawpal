@@ -54,24 +54,31 @@ Paste a sample of your app's CLI or Streamlit output here so a reader can see wh
 
 ## 🧪 Testing PawPal+
 
-```bash
-# Run the full test suite:
-pytest
+```powershell
+# Run the full test suite (collects both files below):
+python -m pytest
 
 # Run with coverage:
-pytest --cov
+python -m pytest --cov
 ```
 
-Sample test output:
+Two test files, covering the model and the scheduler separately:
 
-```
-# platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
-# rootdir: C:\Users\HP\codepath\pawpal
-# plugins: anyio-4.15.1
-# collected 8 items                                                                                                                                                    
+- `tests/test_pawpal.py` — the `Owner`/`Pet`/`Task` model: adding pets/tasks, `is_due` recurrence (daily, weekly-by-weekday, completed-today, completed-and-reopened), and the `ValueError` guard against a weekly task with no weekdays.
+- `tests/test_scheduler.py` — `Scheduler.build_plan`: sort order (priority first, duration as tiebreak, across pets), recurrence filtering (not-due tasks are excluded, not skipped), and budget conflicts (exact-fit vs. one-minute-over boundary, a bigger task crowding out a smaller one, and scheduled times never overlapping).
 
-tests\test_pawpal.py 
-```
+======================================================================== test session starts ========================================================================
+platform win32 -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\HP\codepath\pawpal
+plugins: anyio-4.15.1
+collected 21 items                                                                                                                                                   
+
+tests\test_pawpal.py ..........                                                                                                                                [ 47%]
+tests\test_scheduler.py ...........                                                                                                                            [100%]
+
+======================================================================== 21 passed in 0.10s =========================================================================
+
+Confidence level: 5 stars
 
 ## 📐 Smarter Scheduling
 

@@ -85,6 +85,37 @@ def test_weekly_task_only_due_on_its_selected_weekdays():
     assert task.is_due(tuesday) is False
 
 
+def test_weekly_task_completed_on_due_day_is_not_due_again_same_day():
+    this_monday = date(2026, 10, 12)
+    task = Task(
+        title="Brushing",
+        duration_minutes=15,
+        priority=Priority.LOW,
+        frequency=Frequency.WEEKLY,
+        weekdays={0},  # Monday only
+    )
+
+    task.mark_completed(this_monday)
+
+    assert task.is_due(this_monday) is False
+
+
+def test_weekly_task_completed_on_due_day_is_due_again_next_matching_weekday():
+    this_monday = date(2026, 10, 12)
+    next_monday = date(2026, 10, 19)
+    task = Task(
+        title="Brushing",
+        duration_minutes=15,
+        priority=Priority.LOW,
+        frequency=Frequency.WEEKLY,
+        weekdays={0},  # Monday only
+    )
+
+    task.mark_completed(this_monday)
+
+    assert task.is_due(next_monday) is True
+
+
 def test_weekly_task_without_weekdays_raises_on_creation():
     with pytest.raises(ValueError):
         Task(
